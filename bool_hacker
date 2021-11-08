@@ -1,0 +1,186 @@
+import pandas as pd
+import numpy as np
+pd.set_option('display.max_rows', None)
+def perem(function):
+  return function.__code__.co_varnames
+def hack(foo):
+    book = perem(foo)
+    book = list(book)
+    f = len(book)
+    df = (truth_table(book, f, foo))
+    dnf_1 = dnf(df, book, f)
+    c = sdnf(df, book ,f)
+    result1 = find_prime_implicants(f, c)
+    print(df)
+    print(dnf_1)
+    print(realsdnf(result1, f, book, df))
+    print(sheffer(result1, f, book, df))
+
+def truth_table(book, f, foo):
+    arr = []
+    for i in range(len(book)):
+        arr.append((([0] * 2 ** i + [1] * 2 ** i) * (((2 ** ((f - i)) // 2)))))
+    df = pd.DataFrame(arr).T
+    df = df.iloc[:, ::-1]
+    df.columns = [book]
+    l = df.to_numpy()
+    k = []
+    for i in range(len(l)):
+        k.append(int(foo(*l[i])))
+    df['F'] = k
+    return(df)
+
+    
+    
+def dnf(df, book, f):
+   x = []
+   l_new = df.to_numpy()
+   for i in range(len(l_new)):
+       if l_new[i][-1] == 1:
+           x += (*l_new[i][0:f],)
+   books_new = len(x) // len(book)
+   new_words = book * (books_new)
+   c = ''
+   for i in range(0, len(x)):
+       if new_words[i] == book[0]:
+           c += "("
+       if x[i] == 1:
+           c += str(new_words[i].upper())
+       elif x[i] == 0:
+           c += ("-" + str(new_words[i].upper()))
+       if new_words[i] == book[-1]:
+           c += ")v"
+       else:
+           c += "&"
+   if len(c) > 0:
+       return(f"DNF = {c[0:-1]}")
+   else:
+       return('DNF = 0')
+def combine(m, n):
+    a = len(m)
+    u = ''
+    count = 0
+    for i in range(a): 
+        if(m[i] == n[i]):
+            u += m[i]
+        elif(m[i] != n[i]):
+            u += '*'
+            count += 1
+
+    if(count > 1): 
+        return None
+    else:            
+        return u
+def find_prime_implicants(f, c):
+    newList = c
+    im = []
+    chek = []
+    co = 0
+    im2 = []
+    chek1 = []
+    scnd = []
+    trd = []
+    result = []
+    for o in range(f):
+        size = len(newList)
+        for i in range(size):
+            for j in range(i + 1, size):
+                z = combine(newList[i], newList[j])
+                if z != None:
+                    im.append(z)
+                    chek.append(newList[j])
+                    co += 1
+            if co == 0 and newList[i] not in chek:
+                im2.append(newList[i])
+            co = 0
+        chek = []
+        for i in im:
+            if i not in chek1:
+                chek1.append(i)
+        im = chek1
+        chek1 = []
+        newList = im
+        if len(im) > 0:
+            scnd = im
+        if len(set(im)) > f:
+            trd = im
+        im = []
+    if len(im) == 0 and len(scnd) == 0:
+        result = list(set(trd)) + im2
+    elif len(im) == 0:
+        result = list(set(scnd)) + im2
+    else:
+        result = list(set(im)) + im2
+    return result
+  
+
+def sdnf(df, book, f):
+   x = []
+   l_new = df.to_numpy()
+   c = ''
+   for i in range(len(l_new)):
+       if l_new[i][-1] == 1:
+           x += (*l_new[i][0:f],)
+   books_new = len(x) // len(book)
+   new_words = book * (books_new)
+   for i in range(0, len(x)):
+       if x[i] == 1:
+           c += '1'
+       elif x[i] == 0:
+           c += '0'
+       if new_words[i] == book[-1]:
+           c += " "
+   c = c.split()
+   return c
+def realsdnf(result1, f, book, df):
+   sdnfr = ''
+   real_sdnf = list(set(result1))
+   real_sdnf = ''.join(real_sdnf)
+   colvobook = book * (len(real_sdnf) // f)
+   for i in range(len(real_sdnf)):
+       if real_sdnf[i] == '1':
+           sdnfr += str(colvobook[i].upper())
+       elif real_sdnf[i] == '0':
+           sdnfr += ('-' + str(colvobook[i].upper()))
+       if colvobook[i] == book[-1]:
+           sdnfr += ' v '
+   if len(sdnfr) > 4:
+       return(f"SDNF = {sdnfr[0:-2]}")
+   elif dnf(df, book, f) == 'DNF = 0':
+       return(f"SDNF = {dnf(df, book, f)}")
+   else:
+       return("SDNF = 1")
+def sheffer(result1, f, book, df):
+   real_sdnf = list(set(result1))
+   real_sdnf = ''.join(real_sdnf)
+   colvobook = book * (len(real_sdnf) // f)
+   shef = []
+   for i in range(len(real_sdnf)):
+       if real_sdnf[i] == '0':
+           shef.append((f"({colvobook[i]}|{colvobook[i]})"))
+       elif real_sdnf[i] != '*':
+           shef.append(colvobook[i])
+       if colvobook[i] == book[-1]:
+           shef.append('*')
+   shef = shef[0:-1]
+   for j in range(4):
+       for i in range(len(shef) - 1):
+           if shef[i] != '*' and shef[i + 1] == '*' and shef[i - 1] == '*':
+               shef[i] = shef[i]
+           if shef[i] != '*' and shef[i + 1] != '*' and shef[i] != '':
+               shef[i] = ((f"(({shef[i]} | {shef[i + 1]}) | ({shef[i]} | {shef[i + 1]}))"))
+               shef[i + 1] = ''
+       shef = [i for i in shef if i]
+   shef = [i for i in shef if i != '*']
+   for j in range(4):
+       for i in range(len(shef) - 1):
+           if shef[i] != '':
+               shef[i] = ((f"(({shef[i]} | {shef[i]}) | ({shef[i + 1]} | {shef[i + 1]}))"))
+               shef[i + 1] = ''
+       shef = [i for i in shef if i]
+       if len(shef) == 1:
+           break
+   if len(shef) > 0:
+       return (f"Sheffer = {''.join(shef)}")
+   else:
+       return ''
