@@ -1,4 +1,3 @@
-vxod = 'text.prar'
 def decode(vxod):
     file(vxod)
     
@@ -43,7 +42,6 @@ def file(vxod):
             if real_text == '$':
                 break
             real_text = ''
-    z = open('output.txt', 'w')
+    z = open(vxod.split('.')[0]+'.txt', 'w')
     z.write(stop)
     z = z.close()
-decode(vxod)
