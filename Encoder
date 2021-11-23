@@ -1,9 +1,8 @@
 from collections import Counter
 import math
-vxod = 'oblomov.txt'
 def encode(vxod):
     massiv = file(vxod)
-    cycle(massiv)
+    cycle(massiv, vxod)
     
 def file(vxod):
     f = open(vxod, 'r', encoding='utf8').readlines()
@@ -29,7 +28,7 @@ def to_ten(a):
             c += int(a[i]) * (2 ** (len(a) - 1 - i))
         return c
     
-def cycle(massiv):
+def cycle(massiv, vxod):
     percent = len(massiv)
     stroka = massiv
     massiv += '$'
@@ -87,7 +86,7 @@ def cycle(massiv):
     to_bit = []
     for i in range(len(knife)):
         to_bit.append(to_ten(knife[i]))
-    z = open('text.prar', 'wb')
+    z = open(vxod.split('.')[0]+'.prar', 'wb')
     to_byte = bytes(to_bit)
     z.write('|||'.encode())
     for i in range(len(keys_)):
@@ -95,4 +94,3 @@ def cycle(massiv):
     z.write('|||'.encode())
     z.write(to_byte)
     z.close()
-encode(vxod)
