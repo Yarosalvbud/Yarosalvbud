@@ -108,17 +108,31 @@ def horse(horse1:Figure, z, w):
     else:
         return False
 
-def pawn(pawn1:Figure, z, w):
+def pawn(pawn1:Figure, z, w, Figures):
+    field = update_field1(Figures)
     x = pawn1.pos_X
     y = pawn1.pos_Y
+    k = pawn1.color
     if pawn1.color == 'Black':
-        if y == w + 1 and x == z:
+        if y == w + 1 and x == z and field[w][z] == 0:
             return True
+        elif field[w][z] != 0 and ((x == z + 1 and y == w + 1) or (x == z - 1 and y == w + 1)):
+             for elem in Figures:
+                 if elem.pos_X == z and elem.pos_Y == w:
+                     if elem.color != k:
+                         Figures.remove(elem)
+                         return True
         else:
             return False
     elif pawn1.color == 'White':
-        if y == w - 1 and x == z:
+        if y == w - 1 and x == z and field[w][z] == 0:
             return True
+        elif field[w][z] != 0  and ((y == w - 1 and x == z + 1) or (x == z - 1 and y == w - 1)):
+             for elem in Figures:
+                 if elem.pos_X == z and elem.pos_Y == w:
+                     if elem.color != k:
+                         Figures.remove(elem)
+                         return True
         else:
             return False
 
@@ -246,6 +260,35 @@ def get_figure(z, w):
             return elem
     else:
         return 0
+def print_battlefield(Figures):
+        field = update_field1(Figures)
+        print('┌────┬────┬────┬────┬────┬────┬────┬────┬────┐')
+        print('│    │ A  │ B  │ C  │ D  │ E  │ F  │ G  │ H  │')
+        print('├────┼────┼────┼────┼────┼────┼────┼────┼────┤')
+
+        for line in field:
+            print('│ ' + str(field.index(line) + 1) +  '  │', end='')
+
+            for symbl in line:
+                if symbl == '♗':
+                    symbl = '♗' + ' '
+                elif symbl == '♕':
+                    symbl = '♛' + ' '
+                elif symbl == '♙':
+                    symbl = '♙' + ' '
+                elif symbl == 0:
+                    symbl = '  '
+
+                to_print = ' ' + symbl + ' '
+
+                print(to_print, end='│')
+
+            print(' ')
+
+            if field.index(line) != 7:
+                print('├────┼────┼────┼────┼────┼────┼────┼────┼────┤')
+            else:
+                print('└────┴────┴────┴────┴────┴────┴────┴────┴────┘')
     
 def gameWhite():
     counter = 0
@@ -264,9 +307,8 @@ def gameWhite():
             print('Нельзя стоять на месте')
         elif state.color == 'White':
             if state.figure == 'Pawn':
-                funk = pawn(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
+                funk = pawn(state, int(new_pos[0]), int(new_pos[1]), Figures)
+                if funk == True:
                     state.pos_X = int(new_pos[0])
                     state.pos_Y = int(new_pos[1])   
                     counter += 1
@@ -305,7 +347,7 @@ def gameWhite():
                     state.pos_X = int(new_pos[0])
                     state.pos_Y = int(new_pos[1])
                     counter += 1
-            update_field(Figures)
+            print_battlefield(Figures)
             if counter == 0:
                 print('Сделайте правильный ход!!!')
         else:
@@ -328,9 +370,8 @@ def gameBlack():
             print('Нельзя стоять на месте')
         elif state.color == 'Black':
             if state.figure == 'Pawn':
-                funk = pawn(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
+                funk = pawn(state, int(new_pos[0]), int(new_pos[1]), Figures)
+                if funk == True:
                     state.pos_X = int(new_pos[0])
                     state.pos_Y = int(new_pos[1])   
                     counter += 1
@@ -369,7 +410,7 @@ def gameBlack():
                     state.pos_X = int(new_pos[0])
                     state.pos_Y = int(new_pos[1])
                     counter += 1
-            update_field(Figures)
+            print_battlefield(Figures)
             if counter == 0:
                 print('Сделайте правильный ход!!!')
         else:
