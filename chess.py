@@ -250,15 +250,15 @@ def horseattack(z, w, Figures, Figure):
 def strchange(figure):
     figure = figure.title()
     alfa = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    if figure[0] in alfa:
+    if figure[0] in alfa and len(figure) == 2:
         for i in range(len(alfa)):
             if figure[0] == alfa[i]:
                 z = str(i)
-    if int(figure[-1]) > 0 and int(figure[-1]) < 9:
-        a = int(figure[-1]) - 1
-        a = str(a)
-        z = (z + a)
-        return z
+        if int(figure[-1]) > 0 and int(figure[-1]) < 9:
+            a = int(figure[-1]) - 1
+            a = str(a)
+            z = (z + a)
+            return z
     else:
         return False
 
