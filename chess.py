@@ -260,7 +260,7 @@ def strchange(figure):
         z = (z + a)
         return z
     else:
-        return 0
+        return False
 
 def get_figure(z, w):
     for elem in Figures:
@@ -310,7 +310,7 @@ def gameWhite():
         print("Выберите новую позицию")
         new_pos = input()
         new_pos = strchange(new_pos)
-        if pos != 0 and new_pos != 0:
+        if pos != False and new_pos != False:
             state = get_figure(int(pos[0]), int(pos[1]))
             if state == 0:
                 print('Выберите верную позицию фигры')
@@ -376,7 +376,7 @@ def gameBlack():
         print("Выберите новую позицию")
         new_pos = input()
         new_pos = strchange(new_pos)
-        if pos != 0 and new_pos != 0:
+        if pos != False and new_pos != False:
             state = get_figure(int(pos[0]), int(pos[1]))
             if state == 0:
                 print('Выберите верную позицию фигры')
