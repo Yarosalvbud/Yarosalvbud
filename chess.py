@@ -157,59 +157,62 @@ def can_go(z, w, figure):
     x = figure.pos_X
     y = figure.pos_Y
     k = []
-    while x != z or y != w:
-        if x > z and y > w:
-            print(1)
-            x = x - 1
-            y = y - 1
-            if field[y][x] != 0:
-                k.append(y)
-                k.append(x)
-        elif x < z and y < w:
-            print(2)
-            x = x + 1
-            y = y - 1
-            if field[y][x] != 0:
-                k.append(y)
-                k.append(x)
-        elif y > w and x < z:
-            print(3)
-            x = x + 1
-            y = y - 1
-            if field[y][x] != 0:
-                k.append(y)
-                k.append(x)
-        elif y < w and x > z:
-            print(4)
-            x = x - 1
-            y = y + 1
-            if field[y][x] != 0:
-                k.append(y)
-                k.append(x)
-        elif x == z and y > w:
-            print(5)
-            y = y - 1
-            if field[y][x] != 0:
-                k.append(y)
-                k.append(x)
-        elif y < w and x == z:
-            print(6)
-            y = y + 1
-            if field[y][x] != 0:
-                k.append(y)
-                k.append(x)
-        elif x > z and y == w:
-            print(7)
-            x = x - 1
-            if field[y][x] != 0:
-                k.append(y)
-                k.append(x)
-        elif x < z and y == w:
-            print(8)
-            x = x + 1
-            if field[y][x] != 0:
-                k.append(y)
-                k.append(x)
+    if z >= 8 or w >= 8:
+        return False
+    else:
+        while x != z or y != w:
+            if x > z and y > w:
+                print(1)
+                x = x - 1
+                y = y - 1
+                if field[y][x] != 0:
+                    k.append(y)
+                    k.append(x)
+            elif x < z and y < w:
+                print(2)
+                x = x + 1
+                y = y + 1
+                if field[y][x] != 0:
+                    k.append(y)
+                    k.append(x)
+            elif y > w and x < z:
+                print(3)
+                x = x + 1
+                y = y - 1
+                if field[y][x] != 0:
+                    k.append(y)
+                    k.append(x)
+            elif y < w and x > z:
+                print(4)
+                x = x - 1
+                y = y + 1
+                if field[y][x] != 0:
+                    k.append(y)
+                    k.append(x)
+            elif x == z and y > w:
+                print(5)
+                y = y - 1
+                if field[y][x] != 0:
+                    k.append(y)
+                    k.append(x)
+            elif y < w and x == z:
+                print(6)
+                y = y + 1
+                if field[y][x] != 0:
+                    k.append(y)
+                    k.append(x)
+            elif x > z and y == w:
+                print(7)
+                x = x - 1
+                if field[y][x] != 0:
+                    k.append(y)
+                    k.append(x)
+            elif x < z and y == w:
+                print(8)
+                x = x + 1
+                if field[y][x] != 0:
+                    k.append(y)
+                    k.append(x)
     for i in range(len(k) - 1):
         if k[i] == w and k[i + 1] == z and len(k) == 2:
             check = attack(z, w, Figures, figure)
@@ -240,17 +243,24 @@ def horseattack(z, w, Figures, Figure):
                 if elem.color != k:
                     Figures.remove(elem)
                     return True
+    elif field[w][z] == 0:
+        return True
     else:
         return False
-
 def strchange(figure):
     figure = figure.title()
     alfa = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    for i in range(len(alfa)):
-        if figure[0] == alfa[i]:
-            z = str(i)
-    z = (z + figure[-1])
-    return z
+    if figure[0] in alfa:
+        for i in range(len(alfa)):
+            if figure[0] == alfa[i]:
+                z = str(i)
+    if int(figure[-1]) > 0 and int(figure[-1]) < 9:
+        a = int(figure[-1]) - 1
+        a = str(a)
+        z = (z + a)
+        return z
+    else:
+        return 0
 
 def get_figure(z, w):
     for elem in Figures:
@@ -300,58 +310,61 @@ def gameWhite():
         print("Выберите новую позицию")
         new_pos = input()
         new_pos = strchange(new_pos)
-        state = get_figure(int(pos[0]), int(pos[1]))
-        if state == 0:
-            print('Выберите верную позицию фигры')
-        elif pos == new_pos:
-            print('Нельзя стоять на месте')
-        elif state.color == 'White':
-            if state.figure == 'Pawn':
-                funk = pawn(state, int(new_pos[0]), int(new_pos[1]), Figures)
-                if funk == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])   
-                    counter += 1
-            if state.figure == 'Knight':
-                funk = horse(state, int(new_pos[0]), int(new_pos[1]))
-                horsecheck = horseattack(int(new_pos[0]), int(new_pos[1]), Figures, state)
-                if funk == True and horsecheck == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            if state.figure == 'Queen':
-                funk = ferz(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            if state.figure == 'King':
-                funk = king(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            if state.figure == 'Rook':
-                funk = ladya(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            if state.figure == 'Bishop':
-                funk = slon(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            print_battlefield(Figures)
-            if counter == 0:
-                print('Сделайте правильный ход!!!')
+        if pos != 0 and new_pos != 0:
+            state = get_figure(int(pos[0]), int(pos[1]))
+            if state == 0:
+                print('Выберите верную позицию фигры')
+            elif pos == new_pos:
+                print('Нельзя стоять на месте')
+            elif state.color == 'White':
+                if state.figure == 'Pawn':
+                    funk = pawn(state, int(new_pos[0]), int(new_pos[1]), Figures)
+                    if funk == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])   
+                        counter += 1
+                if state.figure == 'Knight':
+                    funk = horse(state, int(new_pos[0]), int(new_pos[1]))
+                    horsecheck = horseattack(int(new_pos[0]), int(new_pos[1]), Figures, state)
+                    if funk == True and horsecheck == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                if state.figure == 'Queen':
+                    funk = ferz(state, int(new_pos[0]), int(new_pos[1]))
+                    go = can_go(int(new_pos[0]), int(new_pos[1]), state)
+                    if funk == True and go == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                if state.figure == 'King':
+                    funk = king(state, int(new_pos[0]), int(new_pos[1]))
+                    go = can_go(int(new_pos[0]), int(new_pos[1]), state)
+                    if funk == True and go == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                if state.figure == 'Rook':
+                    funk = ladya(state, int(new_pos[0]), int(new_pos[1]))
+                    go = can_go(int(new_pos[0]), int(new_pos[1]), state)
+                    if funk == True and go == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                if state.figure == 'Bishop':
+                    funk = slon(state, int(new_pos[0]), int(new_pos[1]))
+                    go = can_go(int(new_pos[0]), int(new_pos[1]), state)
+                    if funk == True and go == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                print_battlefield(Figures)
+                if counter == 0:
+                    print('Сделайте правильный ход!!!')
+            else:
+                print('Выберите белую фигуру')
         else:
-            print('Выберите белую фигуру')
+            print('Выберите верную координату')
                 
 def gameBlack():
     counter = 0
@@ -363,58 +376,61 @@ def gameBlack():
         print("Выберите новую позицию")
         new_pos = input()
         new_pos = strchange(new_pos)
-        state = get_figure(int(pos[0]), int(pos[1]))
-        if state == 0:
-            print('Выберите верную позицию фигры')
-        elif pos == new_pos:
-            print('Нельзя стоять на месте')
-        elif state.color == 'Black':
-            if state.figure == 'Pawn':
-                funk = pawn(state, int(new_pos[0]), int(new_pos[1]), Figures)
-                if funk == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])   
-                    counter += 1
-            if state.figure == 'Knight':
-                funk = horse(state, int(new_pos[0]), int(new_pos[1]))
-                horsecheck = horseattack(int(new_pos[0]), int(new_pos[1]), Figures, state)
-                if funk == True and horsecheck == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            if state.figure == 'Queen':
-                funk = ferz(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            if state.figure == 'King':
-                funk = king(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            if state.figure == 'Rook':
-                funk = ladya(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            if state.figure == 'Bishop':
-                funk = slon(state, int(new_pos[0]), int(new_pos[1]))
-                go = can_go(int(new_pos[0]), int(new_pos[1]), state)
-                if funk == True and go == True:
-                    state.pos_X = int(new_pos[0])
-                    state.pos_Y = int(new_pos[1])
-                    counter += 1
-            print_battlefield(Figures)
-            if counter == 0:
-                print('Сделайте правильный ход!!!')
+        if pos != 0 and new_pos != 0:
+            state = get_figure(int(pos[0]), int(pos[1]))
+            if state == 0:
+                print('Выберите верную позицию фигры')
+            elif pos == new_pos:
+                print('Нельзя стоять на месте')
+            elif state.color == 'Black':
+                if state.figure == 'Pawn':
+                    funk = pawn(state, int(new_pos[0]), int(new_pos[1]), Figures)
+                    if funk == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])   
+                        counter += 1
+                if state.figure == 'Knight':
+                    funk = horse(state, int(new_pos[0]), int(new_pos[1]))
+                    horsecheck = horseattack(int(new_pos[0]), int(new_pos[1]), Figures, state)
+                    if funk == True and horsecheck == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                if state.figure == 'Queen':
+                    funk = ferz(state, int(new_pos[0]), int(new_pos[1]))
+                    go = can_go(int(new_pos[0]), int(new_pos[1]), state)
+                    if funk == True and go == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                if state.figure == 'King':
+                    funk = king(state, int(new_pos[0]), int(new_pos[1]))
+                    go = can_go(int(new_pos[0]), int(new_pos[1]), state)
+                    if funk == True and go == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                if state.figure == 'Rook':
+                    funk = ladya(state, int(new_pos[0]), int(new_pos[1]))
+                    go = can_go(int(new_pos[0]), int(new_pos[1]), state)
+                    if funk == True and go == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                if state.figure == 'Bishop':
+                    funk = slon(state, int(new_pos[0]), int(new_pos[1]))
+                    go = can_go(int(new_pos[0]), int(new_pos[1]), state)
+                    if funk == True and go == True:
+                        state.pos_X = int(new_pos[0])
+                        state.pos_Y = int(new_pos[1])
+                        counter += 1
+                print_battlefield(Figures)
+                if counter == 0:
+                    print('Сделайте правильный ход!!!')
+            else:
+                print('Выберите чёрную фигуру')
         else:
-            print('Выберите чёрную фигуру')
+            print('выберите верную координату')
 
 def game():
     s = 0
