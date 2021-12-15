@@ -64,7 +64,8 @@ Figures = [WPawn0, WPawn1, WPawn2, WPawn3, WPawn4, WPawn5, WPawn6, WPawn7, BPawn
                BPawn3, BPawn2, BPawn1, BPawn0, WRook0, WRook1, WKnight1, WKnight0, WBishop0, WBishop1, WKing, WQueen,
                BRook1, BRook0, BBishop1, BBishop0, BKnight1, BKnight0, BKing, BQueen]
 
-
+History = ['Start', 'Stop']
+s = ''
 def ladya(ladya1:Figure, z, w):
     x = ladya1.pos_X
     y = ladya1.pos_Y
@@ -84,7 +85,7 @@ def king(king1:Figure, z, w):
 def slon(slon1:Figure, z, w):
     x = slon1.pos_X
     y = slon1.pos_Y
-    if x + z == y + w or abs(x - z) == abs(y - w):
+    if abs(x - z) == abs(y - w):
         return True
     else:
         return False
@@ -126,6 +127,9 @@ def pawn(pawn1:Figure, z, w, Figures):
                              return True
                          elif elem.figure == 'King':
                              return True
+        elif pawn1.pos_Y == 6 and y == w + 2 and x == z and field[w][z] == 0:
+            return True
+            
         else:
             return False
     elif pawn1.color == 'White':
@@ -135,10 +139,13 @@ def pawn(pawn1:Figure, z, w, Figures):
              for elem in Figures:
                  if elem.pos_X == z and elem.pos_Y == w:
                      if elem.color != k:
-                         Figures.remove(elem)
-                         return True
+                         if elem.figure != 'King':
+                             Figures.remove(elem)
+                             return True
                      elif elem.figure == 'King':
                              return True
+        elif pawn1.pos_Y == 1 and y == w - 2 and x == z and field[w][z] == 0:
+            return True
         else:
             return False
 
@@ -228,7 +235,11 @@ def attack(z, w, Figures, Figure):
         for elem in Figures:
             if elem.pos_X == z and elem.pos_Y == w:
                 if elem.color != k and (ladya(elem, z, w) == True or king(elem, z, w) == True or slon(elem, z, w) == True or ferz(elem, z, w) == True):
-                    if elem.figure != 'King':
+                    if Figure == 'King' and elem.figure != 'King':
+                        if  kingcheck(Figures, Figure, z, w) != 'Шах':
+                            Figures.remove(elem)
+                            return True
+                    elif elem.figure != 'King':
                         Figures.remove(elem)
                         return True
                     elif elem.figure == 'King':
@@ -279,8 +290,17 @@ def shach(Figures, figure2):
     z = figure2.pos_X
     w = figure2.pos_Y
     for elem in Figures:
-        if elem.figure != 'Knight' and elem.figure != 'Pawn' and elem.color != figure2.color:
-            if can_go(z, w, elem) == True and (ladya(elem, z, w) == True or king(elem, z, w) == True or slon(elem, z, w) == True or ferz(elem, z, w) == True):
+        if elem.figure == 'Rook' and elem.color != figure2.color:
+            if can_go(z, w, elem) == True and ladya(elem, z, w) == True:
+                status.append(1)
+        elif elem.figure == 'Bishop' and elem.color != figure2.color:
+            if can_go(z, w, elem) == True and slon(elem, z, w) == True:
+                status.append(1)
+        elif elem.figure == 'Queen' and elem.color != figure2.color:
+            if can_go(z, w, elem) == True and ferz(elem, z, w) == True:
+                status.append(1)
+        elif elem.figure == 'King' and elem.color != figure2.color:
+            if can_go(z, w, elem) == True and king(elem, z, w) == True:
                 status.append(1)
         elif elem.figure == 'Knight' and elem.color != figure2.color:
             if horseattack(z, w, Figures, elem) == True and horse(elem, z, w) == True:
@@ -290,15 +310,51 @@ def shach(Figures, figure2):
                 status.append(1)
         else:
             status.append(0)
-    if 1 in status:
+    if status.count(1) == 1:
         return 'Шах'
     else:
         return 'Ok'
+    
+def kingcheck(Figures, figure2, z, w):
+    status = []
+    for elem in Figures:
+        if elem.figure == 'Rook' and elem.color != figure2.color:
+            if can_go(z, w, elem) == True and ladya(elem, z, w) == True:
+                status.append(1)
+                print(elem.figure, elem.color)
+        elif elem.figure == 'Bishop' and elem.color != figure2.color:
+            if can_go(z, w, elem) == True and slon(elem, z, w) == True:
+                status.append(1)
+                print(elem.figure, elem.color)
+        elif elem.figure == 'Queen' and elem.color != figure2.color:
+            if can_go(z, w, elem) == True and ferz(elem, z, w) == True:
+                status.append(1)
+                print(elem.figure, elem.color)
+        elif elem.figure == 'King' and elem.color != figure2.color:
+            if can_go(z, w, elem) == True and king(elem, z, w) == True:
+                status.append(1)
+                print(elem.figure, elem.color)
+        elif elem.figure == 'Knight' and elem.color != figure2.color:
+            if horseattack(z, w, Figures, elem) == True and horse(elem, z, w) == True:
+                status.append(1)
+                print(elem.figure, elem.color)
+        elif elem.figure == 'Pawn' and elem.color != figure2.color:
+            if pawn(elem, z, w, Figures) == True:
+                if (elem.pos_Y != w + 1 and elem.pos_X != z) or (elem.pos_Y != w - 1 and elem.pos_X != z):
+                    status.append(1)
+                    print(elem.figure, elem.color)
+        else:
+            status.append(0)
+    if status.count(1) == 1:
+        return 'Шах'
+    else:
+        return 'Ok'
+
 def kinggo(figure, Figures):
     counter = 0
     while counter < 1:
         if figure.color == 'Black' and shach(Figures, figure) == 'Шах':
-            print('Ходите чёрным королём или другой фигурой, шах ')
+            print('Ходите чёрным королём или другой фигурой, шах')
             pos = input()
             pos = strchange(pos)
             print("Выберите новую позицию")
@@ -352,16 +408,20 @@ def kinggo(figure, Figures):
                             state.pos_X = int(new_pos[0])
                             state.pos_Y = int(new_pos[1])
                             counter += 1
-                if counter == 0 or shach(Figures, figure) == 'Шах':
+                if state != 0 and (counter == 0 or shach(Figures, figure) == 'Шах'):
                     print('Сделайте правильный ход')
-                    state.pos_X = int(pos[0])
-                    state.pos_Y = int(pos[1])
-                    counter = 0
+                    try:
+                        state.pos_X = int(pos[0])
+                        state.pos_Y = int(pos[1])
+                        counter = 0
+                    except:
+                        counter = 0
+                        continue
             else:
                 print('Выберите верную координату')
                 
         elif figure.color == 'White' and shach(Figures, figure) == 'Шах':
-            print('Ходите белым королём, шах')
+            print('Ходите белым королём или другой фигурой, шах')
             pos = input()
             pos = strchange(pos)
             print("Выберите новую позицию")
@@ -415,16 +475,24 @@ def kinggo(figure, Figures):
                             state.pos_X = int(new_pos[0])
                             state.pos_Y = int(new_pos[1])
                             counter += 1
-                if counter == 0 or shach(Figures, figure) == 'Шах':
+                if state != 0 and (counter == 0 or shach(Figures, figure) == 'Шах'):
                     print('Сделайте правильный ход')
-                    state.pos_X = int(pos[0])
-                    state.pos_Y = int(pos[1])
-                    counter = 0
+                    try:
+                        state.pos_X = int(pos[0])
+                        state.pos_Y = int(pos[1])
+                        counter = 0
+                    except:
+                        counter = 0
+                        continue
             else:
                 print('Выберите верную координату')
+    history(pos)
+    history(new_pos)
     
 def print_battlefield(Figures):
+        z = newhistory(s)
         field = update_field1(Figures)
+        print(z)
         print('┌────┬────┬────┬────┬────┬────┬────┬────┬────┐')
         print('│    │ A  │ B  │ C  │ D  │ E  │ F  │ G  │ H  │')
         print('├────┼────┼────┼────┼────┼────┼────┼────┼────┤')
@@ -454,9 +522,22 @@ def print_battlefield(Figures):
                 print('├────┼────┼────┼────┼────┼────┼────┼────┼────┤')
             else:
                 print('└────┴────┴────┴────┴────┴────┴────┴────┴────┘')
+def history(positions):
+    b = ''
+    alfa = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    a = int(positions[-1]) + 1
+    a = str(a)
+    for i in range(len(alfa)):
+        if int(positions[0]) == i:
+            b = alfa[i]
+    z = b + a
+    History.append(z)
 
+def newhistory(s):
+    for i in range(0, len(History) - 1, 2):
+        s += (str(History[i]) + '-' + str(History[i + 1]) + '\n')
+    return s
     
-        
 def gameWhite():
     counter = 0
     while counter < 1:
@@ -524,6 +605,8 @@ def gameWhite():
                 print('Выберите белую фигуру')
         else:
             print('Выберите верную координату')
+    history(pos)
+    history(new_pos)
                 
 def gameBlack():
     counter = 0
@@ -592,10 +675,14 @@ def gameBlack():
                 print('Выберите чёрную фигуру')
         else:
             print('выберите верную координату')
+    history(pos)
+    history(new_pos)
+            
 
 def game(Figures):
     s = 0
-    while True:
+    z = True
+    while z:
         os.system('cls')
         print_battlefield(Figures)
         s += 1
@@ -603,14 +690,28 @@ def game(Figures):
             print('Ход белых')
             if shach(Figures, WKing) != 'Шах':
                 gameWhite()
+            elif shach(Figures, WKing) == 'Мат':
+                z = False
             else:
-                kinggo(WKing, Figures)
+                print('Вы точно уверены что это не мат ?, если уверены введите - Да')
+                otv = input()
+                if otv == 'Да':
+                    kinggo(WKing, Figures)
+                else:
+                    z = False
         elif s % 2 == 0:
             print('Ход чёрных')
             if shach(Figures, BKing) != 'Шах':
                 gameBlack()
             else:
-                kinggo(BKing, Figures)
+                print('Вы точно уверены что это не мат ?, если уверены введите - Да')
+                otv = input()
+                if otv == 'Да':
+                    kinggo(BKing, Figures)
+                elif shach(Figures, WKing) == 'Мат':
+                    z = False
+                else:
+                    z = False
     print('Игра окончена')
 
 game(Figures)
