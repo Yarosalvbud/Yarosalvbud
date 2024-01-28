@@ -1,5 +1,6 @@
-- 👋 Hi, I’m @Yarosalvbud
+- 👋 Hi, I’m Yarosalv
 - 👀 I’m interested in data science
+- You can contact me by telegram: @Yaroslavbud or by mail: budancevya@gmail.com
 
 
 <!---
